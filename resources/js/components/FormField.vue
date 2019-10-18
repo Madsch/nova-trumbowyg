@@ -21,6 +21,13 @@ export default {
     mixins: [FormField, HandlesValidationErrors],
 
     props: ['resourceName', 'resourceId', 'field'],
+    
+    created: function(){
+        Object.keys(this.field.options.btnsDef).map((key, index) => {
+            this.field.options.btnsDef[key].fn = eval(this.field.options.btnsDef[key].fn);
+        })
+
+    },
 
     methods: {
         /*
