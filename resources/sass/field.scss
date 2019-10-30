@@ -6,3 +6,18 @@
 .trumbowyg-details p:not(:last-child) {
   margin-bottom: 15px;
 }
+
+.trumbowyg-editor{
+  h2, h3, h4, p, a.button, a.arrow{
+    margin-bottom: 16px;
+  }
+  p.subtitle{
+    font-size: 20px;
+  }
+  a.button{
+    background: #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+  }
+}

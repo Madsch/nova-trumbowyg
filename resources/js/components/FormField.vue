@@ -15,6 +15,7 @@
 <script>
 import { FormField, HandlesValidationErrors } from 'laravel-nova'
 import trumbowyg from 'vue-trumbowyg';
+import '../plugins/trumbowyg.arrowLink';
 import 'trumbowyg/dist/ui/trumbowyg.css';
 
 export default {
@@ -24,7 +25,7 @@ export default {
     
     created: function(){
         Object.keys(this.field.options.btnsDef).map((key, index) => {
-            this.field.options.btnsDef[key].fn = eval(this.field.options.btnsDef[key].fn);
+            this.field.options.btnsDef[key].fn = this.field.options.btnsDef[key].fn;
         })
 
     },
