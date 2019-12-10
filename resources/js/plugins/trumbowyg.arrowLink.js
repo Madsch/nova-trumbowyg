@@ -6,6 +6,99 @@
     var defaultOptions = {
     };
 
+    function buildLinkDef (trumbowyg) {
+        return {
+            fn: function () {
+                var t = trumbowyg,
+                    documentSelection = t.doc.getSelection(),
+                    selectedRange = documentSelection.getRangeAt(0),
+                    node = documentSelection.focusNode,
+                    text = new XMLSerializer().serializeToString(selectedRange.cloneContents()) || selectedRange + '',
+                    url,
+                    title,
+                    target;
+        
+                while (['A', 'DIV'].indexOf(node.nodeName) < 0) {
+                    node = node.parentNode;
+                }
+        
+                if (node && node.nodeName === 'A') {
+                    var $a = $(node);
+                    text = $a.text();
+                    url = $a.attr('href');
+                    if (!t.o.minimalLinks) {
+                        title = $a.attr('title');
+                        target = $a.attr('target') || t.o.defaultLinkTarget;
+                    }
+                    var range = t.doc.createRange();
+                    range.selectNode(node);
+                    documentSelection.removeAllRanges();
+                    documentSelection.addRange(range);
+                }
+        
+                t.saveRange();
+        
+                var options = {
+                    url: {
+                        label: 'URL',
+                        required: true,
+                        value: url
+                    },
+                    text: {
+                        label: t.lang.text,
+                        value: text
+                    },
+                    newWindow: {
+                        label: 'Open in new window',
+                        value: false,
+                        type: 'checkbox',
+                    }
+                };
+                if (!t.o.minimalLinks) {
+                    $.extend(options, {
+                        title: {
+                            label: t.lang.title,
+                            value: title
+                        },
+                        target: {
+                            label: t.lang.target,
+                            value: target
+                        }
+                    });
+                }
+                
+                t.openModalInsert(t.lang.createLink, options, function (v) { // v is value
+                    var url = v.url;
+                    if (!url.length) {
+                        return false;
+                    }
+
+                    var link = $(['<a href="', url, '">', v.text || v.url, '</a>'].join(''));
+        
+                    if (v.title) {
+                        link.attr('title', v.title);
+                    }
+                    if (v.target || t.o.defaultLinkTarget) {
+                        link.attr('target', v.target || t.o.defaultLinkTarget);
+                    }
+                    if(v.newWindow){
+                        link.attr('target', '_blank');
+                    }
+                    t.range.deleteContents();
+                    t.range.insertNode(link[0]);
+                    t.syncCode();
+                    t.$c.trigger('tbwchange');
+                    return true;
+                });
+            },
+            text: 'Insert link',
+            title: 'Link',
+            hasIcon: true,
+            ico: 'createLink',
+            isSupported: function () { return true; },
+        }
+    }
+
     function buildArrowDef (trumbowyg) {
         return {
             fn: function () {
@@ -47,6 +140,11 @@
                     text: {
                         label: t.lang.text,
                         value: text
+                    },
+                    newWindow: {
+                        label: 'Open in new window',
+                        value: false,
+                        type: 'checkbox',
                     }
                 };
                 if (!t.o.minimalLinks) {
@@ -61,7 +159,7 @@
                         }
                     });
                 }
-        
+                
                 t.openModalInsert(t.lang.createLink, options, function (v) { // v is value
                     var url = v.url;
                     if (!url.length) {
@@ -75,6 +173,9 @@
                     }
                     if (v.target || t.o.defaultLinkTarget) {
                         link.attr('target', v.target || t.o.defaultLinkTarget);
+                    }
+                    if(v.newWindow){
+                        link.attr('target', '_blank');
                     }
                     t.range.deleteContents();
                     t.range.insertNode(link[0]);
@@ -133,6 +234,11 @@
                     text: {
                         label: t.lang.text,
                         value: text
+                    },
+                    newWindow: {
+                        label: 'Open in new window',
+                        value: false,
+                        type: 'checkbox',
                     }
                 };
                 if (!t.o.minimalLinks) {
@@ -161,6 +267,9 @@
                     }
                     if (v.target || t.o.defaultLinkTarget) {
                         link.attr('target', v.target || t.o.defaultLinkTarget);
+                    }
+                    if(v.newWindow){
+                        link.attr('target', '_blank');
                     }
                     t.range.deleteContents();
                     t.range.insertNode(link[0]);
@@ -211,6 +320,7 @@
                     trumbowyg.addBtnDef('subtitle', buildSubtitleDef(trumbowyg));
                     trumbowyg.addBtnDef('arrow', buildArrowDef(trumbowyg));
                     trumbowyg.addBtnDef('button', buildButtonDef(trumbowyg));
+                    trumbowyg.addBtnDef('link', buildLinkDef(trumbowyg));
                 },
                 // Return a list of button names which are active on current element
                 tagHandler: function (element, trumbowyg) {
